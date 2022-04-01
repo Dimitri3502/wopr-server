@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { UpdateGameDto } from './dto/update-game.dto';
-import { IGame, playerEnum } from '@monorepo/common';
+import { IGame, IResponse, playerEnum } from '@monorepo/common';
 import { WoprService } from '../wopr/wopr.service';
 import { checkIfGameFinished, getNewGame } from './utils';
 
@@ -19,11 +19,7 @@ export class GameService {
   }
 
   playerTurn(id: string, updateGameDto: UpdateGameDto) {
-    const res: IGame | { winner: playerEnum } = this.turn(
-      id,
-      playerEnum.YOU,
-      updateGameDto,
-    );
+    const res: IResponse = this.turn(id, playerEnum.YOU, updateGameDto);
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     if (res?.winner) {
@@ -33,7 +29,11 @@ export class GameService {
     return this.turn(id, playerEnum.WOPR, woprTurn);
   }
 
-  turn(id: string, player: playerEnum, updateGameDto: UpdateGameDto) {
+  turn(
+    id: string,
+    player: playerEnum,
+    updateGameDto: UpdateGameDto,
+  ): IResponse {
     const game = this.repository[id];
     if (!game) {
       throw Error('game does not exist : ' + id);
@@ -42,8 +42,8 @@ export class GameService {
     game[updateGameDto.x][updateGameDto.y] = updateGameDto.case;
 
     if (checkIfGameFinished(game)) {
-      return { winner: player };
+      return { game, winner: player };
     }
-    return game;
+    return { game };
   }
 }

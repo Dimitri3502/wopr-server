@@ -10,6 +10,14 @@ const isRowFinished = (game: IGame) =>
     row.every((val) => val !== caseEnum.EMPTY && val === row[0]),
   );
 
+const isDiagFinished = (game: IGame) => {
+  const diag1 = [game[0][0], game[1][1], game[2][2]];
+  const diag2 = [game[0][2], game[1][1], game[2][0]];
+  return [diag1, diag2].some((diag) =>
+    diag.every((val) => val !== caseEnum.EMPTY && val === diag[0]),
+  );
+};
+
 function transposeArray(array, arrayLength) {
   let i;
   const newArray = [];
@@ -29,5 +37,5 @@ function transposeArray(array, arrayLength) {
 export const checkIfGameFinished = (game: IGame) => {
   const tgame = transposeArray(game, 3);
 
-  return isRowFinished(game) || isRowFinished(tgame);
+  return isRowFinished(game) || isRowFinished(tgame) || isDiagFinished(tgame);
 };
